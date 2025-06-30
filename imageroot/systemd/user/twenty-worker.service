@@ -4,7 +4,7 @@
 #
 
 [Unit]
-Description=Podman  twenty-app.service
+Description=Podman  twenty-worker.service
 BindsTo=twenty.service
 After=twenty.service postgresql-app.service
 
@@ -16,12 +16,12 @@ WorkingDirectory=%S/state
 Restart=always
 TimeoutStopSec=70
 ExecStartPre=/bin/mkdir -p config
-ExecStartPre=/bin/rm -f %t/twenty-app.pid %t/twenty-app.ctr-id
+ExecStartPre=/bin/rm -f %t/twenty-worker.pid %t/twenty-worker.ctr-id
 ExecStartPre=-runagent discover-smarthost
-ExecStart=/usr/bin/podman run --conmon-pidfile %t/twenty-app.pid \
-    --cidfile %t/twenty-app.ctr-id --cgroups=no-conmon \
-    --pod-id-file %t/twenty.pod-id --replace -d --name  twenty-app \
-    --volume twenty-app:/app/docker-data:Z \
+ExecStart=/usr/bin/podman run --conmon-pidfile %t/twenty-worker.pid \
+    --cidfile %t/twenty-worker.ctr-id --cgroups=no-conmon \
+    --pod-id-file %t/twenty.pod-id --replace -d --name  twenty-worker \
+    --volume twenty-worker:/app/docker-data:Z \
     --env NODE_PORT=3000 \
     --env SERVER_URL="$SERVER_URL" \
     --env PG_DATABASE_URL="postgresql://twenty:$POSTGRES_PASSWORD@twenty-db:5432/twenty" \
@@ -30,12 +30,12 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/twenty-app.pid \
     --env NODE_ENV=production \
     --env LOG_LEVEL=info \
     --env 'CONFIG_DATABASE_URI="postgresql://postgres:Nethesis,1234@127.0.0.1:5432/twenty"' \
-    ${TWENTY_IMAGE}
-ExecStop=/usr/bin/podman stop --ignore --cidfile %t/twenty-app.ctr-id -t 10
-ExecReload=/usr/bin/podman kill -s HUP twenty-app
+    ${TWENTY_IMAGE} yarn worker:prod
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/twenty-worker.ctr-id -t 10
+ExecReload=/usr/bin/podman kill -s HUP twenty-worker
 SyslogIdentifier=%u
-ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/twenty-app.ctr-id
-PIDFile=%t/twenty-app.pid
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/twenty-worker.ctr-id
+PIDFile=%t/twenty-worker.pid
 Type=forking
 
 [Install]
