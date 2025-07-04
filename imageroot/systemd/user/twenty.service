@@ -10,8 +10,8 @@
 
 [Unit]
 Description=Podman twenty.service
-Requires=postgresql-app.service twenty-app.service
-Before=postgresql-app.service twenty-app.service
+Requires=postgresql-app.service twenty-redis.service twenty-app.service twenty-worker.service
+Before=postgresql-app.service twenty-redis.service twenty-app.service twenty-worker.service
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n

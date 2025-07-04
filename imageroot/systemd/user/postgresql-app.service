@@ -11,7 +11,6 @@ After=twenty.service
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
 EnvironmentFile=%S/state/environment
-# EnvironmentFile=%S/state/secrets/passwords.secret
 Restart=always
 TimeoutStopSec=70
 ExecStartPre=/bin/rm -f %t/postgresql-app.pid %t/postgresql-app.ctr-id
@@ -24,10 +23,8 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/postgresql-app.pid \
     --volume %S/state/restore/:/docker-entrypoint-initdb.d/:Z \
     --env POSTGRES_USER=postgres \
     --env POSTGRES_PASSWORD=Nethesis,1234 \
-    --env POSTGRES_DB=twenty \
     --env TZ=UTC \
     ${POSTGRES_IMAGE}
-ExecStartPost=/usr/bin/bash -c "while ! podman  exec postgresql-app psql -U postgres -d twenty ;  do sleep 5 ; done"
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/postgresql-app.ctr-id -t 10
 ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/postgresql-app.ctr-id
 ExecReload=/usr/bin/podman kill -s HUP postgresql-app

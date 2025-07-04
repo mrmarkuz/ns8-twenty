@@ -6,7 +6,7 @@
 [Unit]
 Description=Podman  twenty-app.service
 BindsTo=twenty.service
-After=twenty.service postgresql-app.service
+After=twenty.service postgresql-app.service twenty-redis.service
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
@@ -15,21 +15,21 @@ EnvironmentFile=-%S/state/smarthost.env
 WorkingDirectory=%S/state
 Restart=always
 TimeoutStopSec=70
-ExecStartPre=/bin/mkdir -p config
 ExecStartPre=/bin/rm -f %t/twenty-app.pid %t/twenty-app.ctr-id
 ExecStartPre=-runagent discover-smarthost
+ExecStartPre=/bin/sh -c 'grep -q APP_SECRET environment || echo "APP_SECRET=`openssl rand -base64 32`" >> environment'
 ExecStart=/usr/bin/podman run --conmon-pidfile %t/twenty-app.pid \
     --cidfile %t/twenty-app.ctr-id --cgroups=no-conmon \
     --pod-id-file %t/twenty.pod-id --replace -d --name  twenty-app \
     --volume twenty-app:/app/docker-data:Z \
     --env NODE_PORT=3000 \
-    --env SERVER_URL="$SERVER_URL" \
-    --env PG_DATABASE_URL="postgresql://twenty:$POSTGRES_PASSWORD@twenty-db:5432/twenty" \
+    --env SERVER_URL=https://${TRAEFIK_HOST} \
+    --env PG_DATABASE_URL="postgresql://postgres:Nethesis,1234@postgresql-app:5432/twenty" \
     --env REDIS_URL="redis://twenty-redis:6379" \
-    --env APP_SECRET="$APP_SECRET" \
+    --env APP_SECRET=${APP_SECRET} \
     --env NODE_ENV=production \
     --env LOG_LEVEL=info \
-    --env 'CONFIG_DATABASE_URI="postgresql://postgres:Nethesis,1234@127.0.0.1:5432/twenty"' \
+    --env STORAGE_TYPE=local \
     ${TWENTY_IMAGE}
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/twenty-app.ctr-id -t 10
 ExecReload=/usr/bin/podman kill -s HUP twenty-app

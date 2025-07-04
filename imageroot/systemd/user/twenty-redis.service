@@ -22,7 +22,7 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/twenty-redis.pid \
     --cidfile %t/twenty-redis.ctr-id --cgroups=no-conmon \
     --pod-id-file %t/twenty.pod-id --replace -d --name  twenty-redis \
     --volume twenty-redis:/data:Z \
-    ${REDIS_IMAGE}
+    ${REDIS_IMAGE} --maxmemory-policy noeviction
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/twenty-redis.ctr-id -t 10
 ExecReload=/usr/bin/podman kill -s HUP twenty-redis
 SyslogIdentifier=%u
