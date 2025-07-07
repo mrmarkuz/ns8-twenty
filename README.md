@@ -4,6 +4,11 @@
 
 ## Install
 
+Install via Software center:
+
+ - Add a Software repository pointing to https://repo.mrmarkuz.com/ns8/updates/, check out the [repo webpage](https://repo.mrmarkuz.com/) how to do it.
+ - Install Twenty via Software Center
+
 Install on CLI:
 
     add-module ghcr.io/nethserver/twenty:0.0.0 1
