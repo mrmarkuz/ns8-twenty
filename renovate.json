@@ -9,7 +9,7 @@
         "docker\\.io/twentycrm/twenty:(?<currentValue>[-0-9\\.a-z]+)"
       ],
       "datasourceTemplate": "docker",
-      "depNameTemplate": "nginx"
+      "depNameTemplate": "twentycrm/twenty"
     },
     {
       "fileMatch": ["build-images.sh"],
