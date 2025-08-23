@@ -44,7 +44,7 @@ buildah config --entrypoint=/ \
     --label="org.nethserver.authorizations=traefik@node:routeadm" \
     --label="org.nethserver.tcp-ports-demand=1" \
     --label="org.nethserver.rootfull=0" \
-    --label="org.nethserver.images=docker.io/postgres:16.10 docker.io/redis:8.2.1 docker.io/twentycrm/twenty:v1.4.1" \
+    --label="org.nethserver.images=docker.io/postgres:16.10 docker.io/redis:8.2.1 docker.io/twentycrm/twenty:v1.3.1" \
     "${container}"
 # Commit the image
 buildah commit "${container}" "${repobase}/${reponame}"
